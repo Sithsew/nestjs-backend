@@ -1,26 +1,35 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
-export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+
+  async findOneByEmail(email: string): Promise<User | undefined> {
+    this.logger.log(`Searching for user with email: ${email}`);
+    const user = await this.userModel.findOne({ email }).exec();
+    if (!user) {
+      this.logger.warn(`User with email: ${email} not found`);
+    }
+    return user;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async create(createUserDto: any): Promise<User> {
+    this.logger.log(`Creating user with email: ${createUserDto.email}`);
+    const createdUser = new this.userModel(createUserDto);
+    const savedUser = await createdUser.save();
+    this.logger.log(`User created successfully with email: ${createUserDto.email}`);
+    return savedUser;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async findAll(): Promise<User[]> {
+    this.logger.log('Fetching all users');
+    const users = await this.userModel.find().exec();
+    this.logger.log(`Found ${users.length} users`);
+    return users;
   }
 }
