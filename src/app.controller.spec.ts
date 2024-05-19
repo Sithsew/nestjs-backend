@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 
 describe('AppController', () => {
   let appController: AppController;
+  let appService: AppService;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -11,11 +12,14 @@ describe('AppController', () => {
       providers: [AppService],
     }).compile();
 
+    appService = app.get<AppService>(AppService);
     appController = app.get<AppController>(AppController);
   });
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
+      jest.spyOn(appService, 'getHello').mockReturnValue('Hello World!');
+
       expect(appController.getHello()).toBe('Hello World!');
     });
   });
