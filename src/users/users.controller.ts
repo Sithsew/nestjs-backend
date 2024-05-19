@@ -1,6 +1,19 @@
-import { Controller, Get, UseGuards, Request, Logger, HttpException, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  Request,
+  Logger,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('user')
 @Controller('user')
@@ -21,10 +34,13 @@ export class UserController {
       }
       return req.user;
     } catch (error) {
-      this.logger.error(`Error fetching user profile: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error fetching user profile: ${error.message}`,
+        error.stack,
+      );
       throw new HttpException(
         error.message || 'An unexpected error occurred',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
